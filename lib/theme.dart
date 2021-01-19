@@ -1,0 +1,11 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+Color orange = Color.fromRGBO(254, 92, 34, 1);
+Color blue = Color.fromRGBO(9, 77, 154, 1);
+TextStyle heading = GoogleFonts.aBeeZee(fontSize: 22,fontWeight: FontWeight.bold);
+TextStyle heading1 = GoogleFonts.aBeeZee(fontSize: 22,fontWeight: FontWeight.bold,color: Colors.white);
+TextStyle subheading = GoogleFonts.aBeeZee(fontSize: 20,fontWeight: FontWeight.w500);
+TextStyle subheading1 = GoogleFonts.aBeeZee(fontSize: 20,fontWeight: FontWeight.w500,color: Colors.white);
+TextStyle normal = GoogleFonts.aBeeZee(fontStyle: FontStyle.italic,fontSize: 16,fontWeight: FontWeight.w300);
+TextStyle normal1 = GoogleFonts.aBeeZee(fontStyle: FontStyle.italic,fontSize: 16,fontWeight: FontWeight.w300,color: Colors.white);
