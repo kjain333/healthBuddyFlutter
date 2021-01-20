@@ -40,6 +40,9 @@ dependencies:
   fluttertoast: ^7.1.6
   percent_indicator: ^2.1.9
   table_calendar: ^2.3.3
+  webview_flutter: ^1.0.7
+  file_picker: ^1.4.2
+  firebase_storage: ^5.0.1
 
 dev_dependencies:
   flutter_test:

@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -5,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -148,6 +152,34 @@ class _Login extends State<Login>{
               SizedBox(
                 height: 10,
               ),
+              FlatButton(
+                color: blue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25.0),
+                ),
+                onPressed: () async {
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                  String result = await Navigator.push(context, MaterialPageRoute(builder: (context)=>WebViewExample("https://drchrono.com/o/authorize/?redirect_uri=https://kshitij-arora.github.io/HealthBuddy/&response_type=code&client_id=HGgz65aoFqGieLTRKjcJsIgEJJMpwvtOrpqwTBfN")));
+                  if(result==null)
+                    {
+                      Fluttertoast.showToast(msg: "Please Log in with Dr. Chrono");
+                    }
+                  else
+                    {
+                      print(result);
+                      prefs.setString("access-token", result);
+                      prefs.setString("type", prefs.getString("mode"));
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>IntroScreen()));
+                    }
+                  },
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text("LOGIN WITH DR. CHRONO",style: heading1),
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
               GestureDetector(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
@@ -163,4 +195,80 @@ class _Login extends State<Login>{
     );
   }
 
+}
+class WebViewExample extends StatefulWidget {
+  String authUrl;
+  WebViewExample(this.authUrl);
+  @override
+  WebViewExampleState createState() => WebViewExampleState(authUrl);
+}
+
+class WebViewExampleState extends State<WebViewExample> {
+  String authUrl;
+  WebViewExampleState(this.authUrl);
+  WebViewController controllerGlobal;
+  Completer<WebViewController> _controller = Completer<WebViewController>();
+  @override
+  void initState() {
+    super.initState();
+    if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.red,
+            title: Text("Health Buddy",style: TextStyle(fontSize: 25),),
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back,size: 25,color: Colors.white,),
+              onPressed: (){
+                Navigator.pop(context,null);
+              },
+            ),
+          ),
+          body: Column(
+            children: [
+
+              Expanded(
+                child: WebView(
+                  initialUrl: authUrl,
+                  javascriptMode: JavascriptMode.unrestricted,
+                  javascriptChannels: Set.from([
+                    JavascriptChannel(
+                        name: 'Print',
+                        onMessageReceived: (JavascriptMessage message) {
+                          //This is where you receive message from
+                          //javascript code and handle in Flutter/Dart
+                          //like here, the message is just being printed
+                          //in Run/LogCat window of android studio
+                          print(message.message + " javascript");
+                        })
+                  ]),
+                  onWebViewCreated:
+                      (WebViewController webViewController) {
+                    _controller.complete(webViewController);
+                    controllerGlobal = webViewController;
+                  },
+                  onPageStarted: (text){
+                    print("started");
+                    print(text);
+                    if(text.startsWith("https://kshitij-arora.github.io/HealthBuddy/"))
+                      {
+                        Navigator.pop(context,text.split("=").last);
+                      }
+                  },
+                  onPageFinished: (text){
+                    print("ended");
+                  },
+                ),
+              )
+            ],
+          ),
+        ),
+        onWillPop: (){
+          Navigator.pop(context,null);
+          return Future.value(true);
+        });
+  }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:one_health/UploadDocuments.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,19 +13,15 @@ class EditProfile extends StatefulWidget{
     return _EditProfile();
   }
 }
-List<String> tiles = ["Edit Profile","Upload Your Prescription","Blood Test Reports","Useful Scans","Other Details"];
+List<String> tiles = ["Upload Your Prescription","Blood Test Reports","Useful Scans"];
 List<IconData> icons = [Icons.account_circle_sharp,Icons.description,Icons.email,Icons.details,Icons.location_on];
 bool loading = true;
 class _EditProfile extends State<EditProfile> {
   double value = 0.0;
-  TextEditingController email = new TextEditingController();
-  TextEditingController name = new TextEditingController();
-  GlobalKey<FormState> formkey = new GlobalKey();
   void getPrefs() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    value = prefs.getDouble("score")==null?0.0:prefs.getDouble("score");
     setState(() {
-      email.text = prefs.getString("email");
-      name.text = prefs.getString("name");
       loading = false;
     });
   }
@@ -238,6 +235,9 @@ class _EditProfile extends State<EditProfile> {
     return Column(
       children: [
         ListTile(
+          onTap: (){
+            Navigator.push(context,MaterialPageRoute(builder: (context)=>UploadDocuments()));
+          },
           leading: Icon(icons[tiles.indexOf(text)]),
           title: Text(text,style: normal,),
           trailing: Icon(Icons.arrow_forward),

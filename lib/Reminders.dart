@@ -12,8 +12,10 @@ DateTime now = DateTime.now();
 DateTime date=DateTime(now.year,now.month,now.day);
 int length=0;
 Map<DateTime, List> _events={};
+Map<String,List> test = {};
 int ctr=0;
 bool loading = true;
+
 class _Reminders extends State<Reminders> with TickerProviderStateMixin{
 
   List selectedevent;
@@ -24,7 +26,12 @@ class _Reminders extends State<Reminders> with TickerProviderStateMixin{
   Future<void> initialiseEvents() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String data = prefs.getString("reminders");
-    _events = jsonDecode(data);
+    dynamic decodedData = jsonDecode(data);
+    for(String key in decodedData.keys)
+      {
+        _events[DateTime.parse(key)] = decodedData[key];
+        test[key] = decodedData[key];
+      }
     setState(() {
       loading = false;
     });
@@ -218,19 +225,25 @@ class _Reminders extends State<Reminders> with TickerProviderStateMixin{
                                                   date=DateTime(now.year,now.month,now.day);
                                                 }
                                                 date = DateTime(date.year,date.month,date.day);
-
                                                 if(_events.containsKey(date))
                                                 {
                                                   _events.update(date, (value) => value+[controller.text]);
+                                                  test.update(date.toIso8601String(), (value) => value+[controller.text]);
                                                 }
                                                 else
-                                                  _events.addAll({date:[controller.text]});
+                                                  {
+                                                    _events.addAll({date:[controller.text]});
+                                                    test.addAll({
+                                                      date.toIso8601String(): [controller.text]
+                                                    });
+                                                  }
+
                                                 print(controller.text);
                                                 print(date);
                                                 controller.clear();
                                                 date=DateTime.now();
                                                 SharedPreferences prefs = await SharedPreferences.getInstance();
-                                                prefs.setString("reminders", jsonEncode(_events));
+                                                prefs.setString("reminders", jsonEncode(test));
                                                 // controller.dispose();
                                                 Navigator.pop(context);
                                                 setState(() {
